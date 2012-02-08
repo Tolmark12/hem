@@ -62,18 +62,17 @@ class Package
   # ---------- Server
     
   createServerDev : ( kind ) ->
-    switch kind
-      when 'app'
-        content = @compileApp
-      when 'lib'
-        content = @compileLibrary
-      when 'deps' 
-        content = @compileDependencies
-    
     (env, callback) =>
+      switch kind
+        when 'app'
+          content = @compileApp()
+        when 'lib'
+          content = @compileLibrary()
+        when 'deps' 
+          content = @compileDependencies()
       callback(200, 
         'Content-Type': 'text/javascript', 
-        content())
+        content)
 
   # ---------------------------------------------- END NEW
 
