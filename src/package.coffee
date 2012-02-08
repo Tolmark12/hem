@@ -66,6 +66,20 @@ class Package
       callback(200, 
         'Content-Type': 'text/javascript', 
         @compile())
+  
+  createServerDev : ( kind ) ->
+    console.log "Creating server..."
+    (req, res, next) =>
+      switch kind
+        when 'app'
+          content = @compileApp()
+        when 'lib'
+          content = @compileLibrary()
+        when 'deps' 
+          content = @compileDependencies()
+      
+      res.writeHead 200, 'Content-Type': 'text/javascript'
+      res.end content
 
   # ---------------------------------------------- END NEW
 
