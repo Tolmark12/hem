@@ -1,7 +1,7 @@
 { 
-  "name": "hem", 
+  "name": "meh", 
   "description": "CommonJS stitcher.", 
-  "version": "0.1.8", 
+  "version": "0.0.1", 
   "author": "maccman", 
   "licenses":
     [{ 
@@ -14,7 +14,7 @@
   }, 
   "engine" : [ "node >=0.1.102" ], 
   "main" : "./lib/hem.js",
-  "bin": { "hem": "./bin/hem" },
+  "bin": { "meh": "./bin/hem" },
   "dependencies" : { 
     "eco": "1.1.0-rc-3",
     "uglify-js": "~1.1.1",

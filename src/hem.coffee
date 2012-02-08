@@ -8,7 +8,7 @@ css       = require('./css')
 specs     = require('./specs')
 
 argv = optimist.usage([
-  '  usage: hem COMMAND',
+  '  usage: meh COMMAND',
   '    server  start a dynamic development server',
   '    build   serialize application to disk',
   '    watch   build & watch disk for changes'
@@ -53,12 +53,16 @@ class Hem
     
     @app = new strata.Builder
     
+
   server: ->
     @app.use(strata.contentLength)
       
     @app.get(@options.cssPath, @cssPackage().createServer())
-    @app.get(@options.jsPath, @hemPackage().createServer())
-    
+    # @app.get(@options.jsPath, @hemPackage().createServer())
+    @app.get(@options.jsPath, @hemPackage().createServerDev('app'))
+    @app.get(@options.libsPath, @hemPackage().createServerDev('lib'))
+    @app.get(@options.dependencyPath, @hemPackage().createServerDev('deps'))
+
     if path.existsSync(@options.specs)
       @app.get(@options.specsPath, @specsPackage().createServer())
           
@@ -70,13 +74,46 @@ class Hem
       @app.use(strata.static, @options.public, ['index.html', 'index.htm'])
     
     strata.run(@app, port: @options.port)
+
+    # @app.use(strata.contentLength)
+      
+    # @app.get(@options.cssPath, @cssPackage().createServer())
+    # @app.get(@options.jsPath, @hemPackage().createServer())
+    
+    # if path.existsSync(@options.specs)
+    #   @app.get(@options.specsPath, @specsPackage().createServer())
+          
+    # if path.existsSync(@options.testPublic)
+    #   @app.map @options.testPath, (app) =>
+    #     app.use(strata.static, @options.testPublic, ['index.html', 'index.htm'])
+    
+    # if path.existsSync(@options.public)
+    #   @app.use(strata.static, @options.public, ['index.html', 'index.htm'])
+    
+    # strata.run(@app, port: @options.port)
     
   build: ->
-    source = @hemPackage().compile(not argv.debug)
+
+    console.log "compiling..."
+    source = @hemPackage().compileApp(true)
     fs.writeFileSync(path.join(@options.public, @options.jsPath), source)
     
-    source = @cssPackage().compile()
-    fs.writeFileSync(path.join(@options.public, @options.cssPath), source)
+    source = @hemPackage().compileLibrary(true)
+    fs.writeFileSync(path.join(@options.public, @options.libsPath), source)
+
+    source = @hemPackage().compileDependencies(true)
+    fs.writeFileSync(path.join(@options.public, @options.dependencyPath), source)
+    console.log "compiled:"
+    console.log @options.jsPath
+    console.log @options.libsPath
+    console.log @options.dependencyPath
+    
+
+    # source = @hemPackage().compile(not argv.debug)
+    # fs.writeFileSync(path.join(@options.public, @options.jsPath), source)
+    
+    # source = @cssPackage().compile()
+    # fs.writeFileSync(path.join(@options.public, @options.cssPath), source)
 
   watch: ->
     @build() 

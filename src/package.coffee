@@ -27,12 +27,47 @@ class Package
     result = [@compileLibs(), @compileModules()].join("\n")
     result = uglify(result) if minify
     result
+ 
+  # ---------------------------------------------- NEW
+
+  # ---------- Helpers..
+
+  _compileDeps: ->
+    @dependency or= new Dependency(@dependencies)
+    @modules      = @dependency.resolve()
+    stitch(identifier: @identifier, modules: @modules)
+
+  _compileApp : ->
+    @stitch       = new Stitch(@paths)
+    @modules      = @stitch.resolve()
+    stitch(identifier: @identifier, modules: @modules)
+  
+  # ---------- Compiles
+
+  compileApp : (minify) ->
+    result = [@_compileApp()].join("\n")
+    result = uglify(result) if minify
+    result
+
+  compileLibrary : (minify) ->
+    result = [@compileLibs()].join("\n")
+    result = uglify(result) if minify
+    result
+
+  compileDependencies : (minify) ->
+    result = [@_compileDeps()].join("\n")
+    result = uglify(result) if minify
+    result
+  
+  # ---------- Server
     
   createServer: ->
     (env, callback) =>
       callback(200, 
         'Content-Type': 'text/javascript', 
         @compile())
+
+  # ---------------------------------------------- END NEW
 
 module.exports = 
   compilers:  compilers
